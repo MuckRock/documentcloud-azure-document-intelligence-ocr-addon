@@ -103,17 +103,17 @@ class DocumentIntelligence(AddOn):
 
             page_chunk_size = 100  # Set your desired chunk size
             for i in range(0, len(pages), page_chunk_size):
-                chunk = pages[i : i + page_chunk_size]
-                resp = self.client.patch(
-                    f"documents/{document.id}/", json={"pages": chunk}
-                )
-                resp.raise_for_status()
                 while True:
                     time.sleep(10)
                     if (
                         document.status == "success"
                     ):  # Break out of for loop if document status becomes success
                         break
+                chunk = pages[i : i + page_chunk_size]
+                resp = self.client.patch(
+                    f"documents/{document.id}/", json={"pages": chunk}
+                )
+                resp.raise_for_status()
             if to_tag:
                 document.data["ocr_engine"] = "azure"
                 document.save()
