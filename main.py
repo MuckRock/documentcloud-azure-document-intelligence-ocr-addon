@@ -101,7 +101,7 @@ class DocumentIntelligence(AddOn):
 
                 pages.append(dc_page)
 
-            page_chunk_size = 10  # Set your desired chunk size
+            page_chunk_size = 50  # Set your desired chunk size
             for i in range(0, len(pages), page_chunk_size):
                 while True:
                     time.sleep(10)
