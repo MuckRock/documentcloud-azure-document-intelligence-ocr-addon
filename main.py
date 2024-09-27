@@ -104,9 +104,10 @@ class DocumentIntelligence(AddOn):
             page_chunk_size = 50  # Set your desired chunk size
             for i in range(0, len(pages), page_chunk_size):
                 while True:
+                    document_ref = self.client.documents.get(document.id)
                     time.sleep(10)
                     if (
-                        document.status == "success"
+                        document_ref.status == "success"
                     ):  # Break out of for loop if document status becomes success
                         break
                 chunk = pages[i : i + page_chunk_size]
