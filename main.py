@@ -116,6 +116,13 @@ class DocumentIntelligence(AddOn):
                 )
                 resp.raise_for_status()
             if to_tag:
+                while True:
+                    document_ref = self.client.documents.get(document.id)
+                    time.sleep(10)
+                    if (
+                        document_ref.status == "success"
+                    ):  # Break out of for loop if document status becomes success
+                        break
                 document.data["ocr_engine"] = "azure"
                 document.save()
 
