@@ -101,7 +101,7 @@ class DocumentIntelligence(AddOn):
 
                 pages.append(dc_page)
 
-            page_chunk_size = 20  # Max allowable by the API
+            page_chunk_size = 50  # Max allowable by the API
             for i in range(0, len(pages), page_chunk_size):
                 while True:
                     document_ref = self.client.documents.get(document.id)
