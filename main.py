@@ -111,10 +111,12 @@ class DocumentIntelligence(AddOn):
                     ):  # Break out of for loop if document status becomes success
                         break
                 chunk = pages[i : i + page_chunk_size]
+                print("Updating the page text")
                 resp = self.client.patch(
                     f"documents/{document.id}/", json={"pages": chunk}
                 )
                 resp.raise_for_status()
+                print("Completed updating the page text")
             if to_tag:
                 while True:
                     document_ref = self.client.documents.get(document.id)
@@ -123,8 +125,10 @@ class DocumentIntelligence(AddOn):
                         document_ref.status == "success"
                     ):  # Break out of for loop if document status becomes success
                         break
+                print("Tagging")
                 document.data["ocr_engine"] = "azure"
                 document.save()
+                print("Finished tagging document")
 
 if __name__ == "__main__":
     DocumentIntelligence().main()
