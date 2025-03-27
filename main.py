@@ -102,33 +102,58 @@ class DocumentIntelligence(AddOn):
                 pages.append(dc_page)
 
             page_chunk_size = 30
+            max_retries = 5
+            retry_delay = 30
+            status_check_delay = 10
+
             for i in range(0, len(pages), page_chunk_size):
-                while True:
-                    time.sleep(20)
-                    document_ref = self.client.documents.get(document.id)
-                    if (
-                        document_ref.status == "success"
-                    ):  # Break out of for loop if document status becomes success
-                        break
                 chunk = pages[i : i + page_chunk_size]
-                print("Updating the page text")
-                resp = self.client.patch(
-                    f"documents/{document.id}/", json={"pages": chunk}
-                )
-                resp.raise_for_status()
-                print("Completed updating the page text")
+                retries = 0
+
+                while retries < max_retries:
+                    print(f"Updating the page text (pages {i} to {i + page_chunk_size})")
+                    try:
+                        resp = self.client.patch(
+                            f"documents/{document.id}/", json={"pages": chunk}
+                        )
+                        resp.raise_for_status()
+                    except APIError as exc:
+                        # Check the error message to determine if it's because the document is still processing
+                        if "processing" in str(exc):  # Adjust based on actual error message format
+                            print(f"Document is still processing, retrying... (Attempt {retries + 1} of {max_retries})")
+                            retries += 1
+                            time.sleep(retry_delay)
+                            continue
+                        # If it's another type of error, re-raise
+                        print(f"Unexpected error: {exc}. Exiting retries.")
+                        raise
+                    print("Completed updating the page text")
+                    break
+                else:
+                    print(f"Failed to update pages {i} to {i + page_chunk_size} after {max_retries} attempts.")
+                    break  # Exit loop if retries exceeded
+
+            # Tagging part
             if to_tag:
-                while True:
-                    time.sleep(15)
-                    document_ref = self.client.documents.get(document.id)
-                    if (
-                        document_ref.status == "success"
-                    ):  # Break out of for loop if document status becomes success
-                        break
-                print("Tagging")
-                document.data["ocr_engine"] = "azure"
-                document.save()
-                print("Finished tagging document")
+                retries = 0
+                while retries < max_retries:
+                    print("Checking document status before tagging...")
+                    try:
+                        document_ref = self.client.documents.get(document.id)
+                        if document_ref.status == "success":
+                            print("Tagging document...")
+                            document.data["ocr_engine"] = "azure"
+                            document.save()
+                            print("Finished tagging document")
+                            break
+                        print(f"Document status is {document_ref.status}. Waiting for success...")
+                        time.sleep(status_check_delay)
+                    except APIError as exc:
+                        print(f"Error checking document status: {exc}. Retrying...")
+                        retries += 1
+                        time.sleep(retry_delay)
+                else:
+                    print(f"Failed to tag document after {max_retries} attempts.")
 
 if __name__ == "__main__":
     DocumentIntelligence().main()
