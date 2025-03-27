@@ -105,7 +105,7 @@ class DocumentIntelligence(AddOn):
             for i in range(0, len(pages), page_chunk_size):
                 while True:
                     document_ref = self.client.documents.get(document.id)
-                    time.sleep(10)
+                    time.sleep(30)
                     if (
                         document_ref.status == "success"
                     ):  # Break out of for loop if document status becomes success
