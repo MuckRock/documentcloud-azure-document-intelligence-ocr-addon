@@ -103,22 +103,25 @@ class DocumentIntelligence(AddOn):
 
             page_chunk_size = 30
             for i in range(0, len(pages), page_chunk_size):
-                while True:
-                    document_ref = self.client.documents.get(document.id)
-                    time.sleep(60)
-                    if (
-                        document_ref.status == "success"
-                    ):  # Break out of for loop if document status becomes success
-                        break
                 chunk = pages[i : i + page_chunk_size]
-                print("Updating the page text")
-                resp = self.client.patch(
-                    f"documents/{document.id}/", json={"pages": chunk}
-                )
-                resp.raise_for_status()
-                print("Completed updating the page text")
+                while True:
+                    print("Updating the page text")
+                    try:
+                        resp = self.client.patch(
+                            f"documents/{document.id}/", json={"pages": chunk}
+                        )
+                        resp.raise_for_status()
+                    except APIError as exc:
+                        # TODO check the error message here, re-raise if its not because it is processing
+                        # TODO maybe also limit the number of retries
+                        time.sleep(30)
+                        continue
+                    print("Completed updating the page text")
+                    break
+                    
             if to_tag:
                 while True:
+                    # TODO modify similar to call above
                     document_ref = self.client.documents.get(document.id)
                     time.sleep(10)
                     if (
