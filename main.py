@@ -119,8 +119,8 @@ class DocumentIntelligence(AddOn):
                 print("Completed updating the page text")
             if to_tag:
                 while True:
+                    time.sleep(15)
                     document_ref = self.client.documents.get(document.id)
-                    time.sleep(10)
                     if (
                         document_ref.status == "success"
                     ):  # Break out of for loop if document status becomes success
