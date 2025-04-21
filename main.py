@@ -103,8 +103,7 @@ class DocumentIntelligence(AddOn):
 
             page_chunk_size = 20
             max_retries = 5
-            retry_delay = 30
-            status_check_delay = 10
+            retry_delay = 60
 
             for i in range(0, len(pages), page_chunk_size):
                 chunk = pages[i : i + page_chunk_size]
@@ -118,9 +117,13 @@ class DocumentIntelligence(AddOn):
                         )
                         resp.raise_for_status()
                     except APIError as exc:
-                        # Check the error message to determine if it's because the document is still processing
+                        # Check the error message to determine if it's because
+                        # the document is still processing
                         if "processing" in str(exc):  # Adjust based on actual error message format
-                            print(f"Document is still processing, retrying... (Attempt {retries + 1} of {max_retries})")
+                            print(
+                                "Document is still processing, retrying... "
+                                f"(Attempt {retries + 1} of {max_retries})"
+                            )
                             retries += 1
                             time.sleep(retry_delay)
                             continue
@@ -130,8 +133,15 @@ class DocumentIntelligence(AddOn):
                     print("Completed updating the page text")
                     break
                 else:
-                    print(f"Failed to update pages {i} to {i + page_chunk_size} after {max_retries} attempts.")
-                    break  # Exit loop if retries exceeded
+                    print(
+                        f"Failed to update pages {i} to {i + page_chunk_size}"
+                        f" after {max_retries} attempts."
+                    )
+                    self.set_message(
+                        "Failed to update page text in a timely manner. "
+                        "Please email info@documentcloud.org to debug."
+                    )
+                    sys.exit(1)
 
             # Tagging part
             if to_tag:
@@ -147,13 +157,19 @@ class DocumentIntelligence(AddOn):
                             print("Finished tagging document")
                             break
                         print(f"Document status is {document_ref.status}. Waiting for success...")
-                        time.sleep(status_check_delay)
+                        retries += 1
+                        time.sleep(retry_delay)
                     except APIError as exc:
                         print(f"Error checking document status: {exc}. Retrying...")
                         retries += 1
                         time.sleep(retry_delay)
                 else:
                     print(f"Failed to tag document after {max_retries} attempts.")
+                    self.set_message(
+                        "Failed to set the OCR tag for this document. "
+                        "Email info@documentcloud.org to debug."
+                    )
+                    sys.exit(1)
 
 if __name__ == "__main__":
     DocumentIntelligence().main()
