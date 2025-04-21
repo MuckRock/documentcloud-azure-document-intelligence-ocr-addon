@@ -101,7 +101,7 @@ class DocumentIntelligence(AddOn):
 
                 pages.append(dc_page)
 
-            page_chunk_size = 30
+            page_chunk_size = 20
             max_retries = 5
             retry_delay = 30
             status_check_delay = 10
