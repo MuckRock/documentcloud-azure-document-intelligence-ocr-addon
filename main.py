@@ -101,9 +101,9 @@ class DocumentIntelligence(AddOn):
 
                 pages.append(dc_page)
 
-            page_chunk_size = 10
+            page_chunk_size = 20
             max_retries = 5
-            retry_delay = 180
+            retry_delay = 60
 
             for i in range(0, len(pages), page_chunk_size):
                 chunk = pages[i : i + page_chunk_size]
