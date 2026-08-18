@@ -148,20 +148,16 @@ class DocumentIntelligence(AddOn):
             if to_tag:
                 retries = 0
                 while retries < max_retries:
-                    print("Checking document status before tagging...")
                     try:
-                        document_ref = self.client.documents.get(document.id)
-                        if document_ref.status == "success":
-                            print("Tagging document...")
-                            document.data["ocr_engine"] = "azure"
-                            document.save()
-                            print("Finished tagging document")
-                            break
-                        print(f"Document status is {document_ref.status}. Waiting for success...")
-                        retries += 1
-                        time.sleep(retry_delay)
+                        print("Tagging document...")
+                        self.client.patch(
+                            f"documents/{document.id}/",
+                            json={"data": {"ocr_engine": ["azure"]}},
+                        )
+                        print("Finished tagging document")
+                        break
                     except APIError as exc:
-                        print(f"Error checking document status: {exc}. Retrying...")
+                        print(f"Error tagging document. {exc}. Retrying...")
                         retries += 1
                         time.sleep(retry_delay)
                 else:
