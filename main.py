@@ -126,8 +126,8 @@ class DocumentIntelligence(AddOn):
             try:
                 print("Tagging document...")
                 self.client.patch(
-                    f"documents/{document.id}/",
-                    json={"data": {"ocr_engine": ["azure"]}},
+                    f"documents/{document.id}/data/ocr_engine/",
+                    json={"values": ["azure"]},
                 )
                 print("Finished tagging document")
                 break
