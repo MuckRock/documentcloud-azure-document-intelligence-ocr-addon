@@ -125,6 +125,11 @@ class DocumentIntelligence(AddOn):
         while retries < max_retries:
             try:
                 print("Tagging document...")
+                existing = document.data.get("ocr_engine", [])
+                self.client.patch(
+                    f"documents/{document.id}/data/ocr_engine/",
+                    json={"values": ["azure"], "remove": existing},
+                )
                 self.client.patch(
                     f"documents/{document.id}/data/ocr_engine/",
                     json={"values": ["azure"]},
