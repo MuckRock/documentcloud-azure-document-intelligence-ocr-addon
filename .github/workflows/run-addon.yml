@@ -4,10 +4,10 @@ on: repository_dispatch
 
 jobs:
   Run-Add-On:
-    uses: MuckRock/documentcloud-addon-workflows/.github/workflows/run-addon.yml@v2
+    uses: MuckRock/documentcloud-addon-workflows/.github/workflows/run-addon.yml@wireguard
     with:
       timeout: 360
     secrets:
       token: ${{ secrets.FR_ENDPOINT }}
       key: ${{ secrets.FR_KEY }}
-      # wg_config: ${{ secrets.WG_CONFIG }}
+      wg_config: ${{ secrets.WG_CONFIG }}
