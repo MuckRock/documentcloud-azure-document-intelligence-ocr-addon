@@ -1,6 +1,9 @@
 title: Azure Document Intelligence OCR
 description: This Add-On uses Azure's Document Intelligence API to OCR documents.
 instructions: ''
+disclosures: |
+  This Add-On sends data to a Microsoft Azure Document Intelligent endpoint which uses a form of machine learning to OCR documents. 
+  Read the [privacy policy](https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/document-intelligence/data-privacy-security) to learn more.
 type: object
 documents:
   - selected
